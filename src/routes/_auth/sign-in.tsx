@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GalleryVerticalEndIcon } from "lucide-react";
 import React, { useState } from "react";
 import { z } from "zod";
@@ -40,7 +40,7 @@ function SignInPage() {
       } else if (user) {
         // Successful sign-in, navigate to the app
         // The _app.tsx's beforeLoad will ensure proper authenticated redirect
-        navigate({ to: "/create" as string });
+        navigate({ to: "/residents" as string });
       }
     } catch (validationError) {
       if (validationError instanceof z.ZodError) {
@@ -124,9 +124,13 @@ function SignInPage() {
               </div>
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <a href="/sign-up" className="underline underline-offset-4">
+                <Link
+                  to="/sign-up"
+                  className="underline underline-offset-4"
+                  viewTransition
+                >
                   Sign up
-                </a>
+                </Link>
               </div>
             </form>
           </div>
