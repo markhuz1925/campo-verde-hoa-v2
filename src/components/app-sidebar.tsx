@@ -1,22 +1,16 @@
-// src/components/app-sidebar.tsx
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  ArrowRightLeft,
   ChevronUp,
-  History,
-  Home,
-  ImageIcon,
-  Info,
   LogOut,
-  Palette,
   Settings,
-  Sparkles,
-  Star,
+  Sticker,
   User2,
-  Video,
-  Zap,
+  Users2,
 } from "lucide-react";
 import type * as React from "react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,59 +30,30 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-// FIX: Corrected import from SupabaseAuthStatus to SupabaseAuthStatusDisplay
 
-// Menu data - ADJUSTED URLs to reflect new structure
 const data = {
   navMain: [
     {
-      title: "Create",
-      url: "/create",
-      icon: Home,
+      title: "Residents",
+      url: "residents",
+      icon: Users2,
     },
     {
-      title: "Gallery",
-      url: "/gallery",
-      icon: ImageIcon,
+      title: "Stickers",
+      url: "/stickers",
+      icon: Sticker,
     },
     {
-      title: "About",
-      url: "/about",
-      icon: Info,
-    },
-  ],
-  projects: [
-    {
-      name: "Recent Videos",
-      url: "/recent-videos",
-      icon: History,
-    },
-    {
-      name: "Favorites",
-      url: "/favorites",
-      icon: Star,
-    },
-    {
-      name: "Settings",
-      url: "/settings",
-      icon: Settings,
+      title: "Transactions",
+      url: "/transactions",
+      icon: ArrowRightLeft,
     },
   ],
-  tools: [
+  settings: [
     {
-      name: "Video Generator",
-      url: "/create",
-      icon: Video,
-    },
-    {
-      name: "Style Transfer",
-      url: "/style-transfer",
-      icon: Palette,
-    },
-    {
-      name: "Quick Generate",
-      url: "/quick-generate",
-      icon: Zap,
+      name: "Vehicle Stickers",
+      url: "/vehicle-sticker-settings",
+      icon: Sticker,
     },
   ],
 };
@@ -115,95 +80,62 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/create">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-sidebar-primary-foreground">
-                  <Sparkles className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
-                  <span className="truncate font-semibold">Sora AI</span>
-                  <span className="truncate text-xs">Video Generation</span>
-                </div>
+              <Link to="/residents" className="shrink-0">
+                <img
+                  src="src/assets/logo-512x512.png"
+                  alt="Logo"
+                  className="w-auto h-auto"
+                />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent className="flex-1 overflow-y-auto overflow-x-hidden">
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarMenu>
-            {data.navMain.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.url}
-                >
-                  <Link
-                    to={item.url as string}
-                    className="min-w-0"
-                    viewTransition
+      {isAuthenticated && (
+        <SidebarContent className="flex-1 overflow-y-auto overflow-x-hidden">
+          <SidebarGroup>
+            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarMenu>
+              {data.navMain.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.url}
                   >
-                    <item.icon className="shrink-0" />
-                    <span className="truncate">{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-            {isAuthenticated && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === "/dashboard"}
-                >
-                  <Link
-                    to={"/dashboard" as string}
-                    className="min-w-0"
-                    viewTransition
-                  >
-                    <Home className="shrink-0" />
-                    <span className="truncate">Dashboard</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Tools</SidebarGroupLabel>
-          <SidebarMenu>
-            {data.tools.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to={item.url as string}
-                    className="min-w-0"
-                    viewTransition
-                  >
-                    <item.icon className="shrink-0" />
-                    <span className="truncate">{item.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Library</SidebarGroupLabel>
-          <SidebarMenu>
-            {data.projects.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <Link to={item.url as string} className="min-w-0">
-                    <item.icon className="shrink-0" />
-                    <span className="truncate">{item.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
+                    <Link
+                      to={item.url as string}
+                      className="min-w-0"
+                      viewTransition
+                    >
+                      <item.icon className="shrink-0" />
+                      <span className="truncate">{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel>Settings</SidebarGroupLabel>
+            <SidebarMenu>
+              {data.settings.map((item) => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton asChild>
+                    <Link
+                      to={item.url as string}
+                      className="min-w-0"
+                      viewTransition
+                    >
+                      <item.icon className="shrink-0" />
+                      <span className="truncate">{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+      )}
       <SidebarFooter>
         {isLoading ? (
           <div className="p-4 text-center text-sm">Loading user...</div>
@@ -218,12 +150,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   >
                     {isAuthenticated && user ? (
                       <>
-                        <User2 className="size-4 shrink-0" />
+                        <Avatar className="h-6 w-6">
+                          {/* You might store user.user_metadata.avatar_url in Supabase if you allow avatars */}
+                          <AvatarImage
+                            src={
+                              user?.user_metadata?.avatar_url ||
+                              `https://api.dicebear.com/7.x/initials/svg?seed=${user?.email || "user"}`
+                            }
+                            alt={user?.email || "User"}
+                          />
+                          <AvatarFallback>
+                            {user?.email?.charAt(0).toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight min-w-0">
                           <span className="truncate font-semibold">
                             {user.email || "Authenticated User"}
                           </span>
-                          <span className="truncate text-xs">{user.id}</span>
                         </div>
                         <ChevronUp className="ml-auto size-4 shrink-0" />
                       </>
@@ -242,7 +185,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   align="end"
                   sideOffset={4}
                 >
-                  {isAuthenticated ? (
+                  {isAuthenticated && (
                     <>
                       <DropdownMenuItem asChild>
                         <Link to={"/profile" as string}>
@@ -259,19 +202,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <DropdownMenuItem onClick={handleSignOut}>
                         <LogOut className="mr-2 h-4 w-4" />
                         Sign out
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/sign-in">
-                          <User2 className="mr-2 h-4 w-4" /> Sign In
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/sign-up">
-                          <User2 className="mr-2 h-4 w-4" /> Sign Up
-                        </Link>
                       </DropdownMenuItem>
                     </>
                   )}
