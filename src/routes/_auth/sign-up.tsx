@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GalleryVerticalEndIcon } from "lucide-react";
 import React, { useState } from "react";
 import { z } from "zod";
@@ -134,9 +134,13 @@ function SignUpPage() {
               </div>
               <div className="text-center text-sm">
                 Already have an account?{" "}
-                <a href="/sign-in" className="underline">
+                <Link
+                  to="/sign-in"
+                  className="underline underline-offset-4"
+                  viewTransition
+                >
                   Sign in
-                </a>
+                </Link>
               </div>
             </form>
           </div>
