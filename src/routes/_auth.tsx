@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_auth")({
     // If signed in, redirect away from auth pages
     if (auth.isAuthenticated) {
       throw redirect({
-        to: "/create" as string,
+        to: "/residents" as string,
         search: {
           redirect: location.href, // Use 'redirect' as param name, easier for custom login page
         },
