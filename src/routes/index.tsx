@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
     // If user is authenticated, redirect to the main app page
     if (auth.isAuthenticated) {
       throw redirect({
-        to: "/create" as string,
+        to: "/residents" as string,
       });
     }
 
