@@ -65,7 +65,7 @@ export function SupabaseAuthStatusDisplay() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to="/create">
+            <Link to="/residents">
               <Home className="mr-2 h-4 w-4" />
               Create
             </Link>
