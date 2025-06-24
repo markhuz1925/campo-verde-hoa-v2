@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { useAuth } from "../contexts/AuthContext"; // Import useAuth for redirect logic
 
 export const Route = createFileRoute("/_auth")({
-  beforeLoad: ({ context, location }) => {
+  beforeLoad: ({ context }) => {
     const { auth } = context; // Access auth context
 
     if (auth.isLoading) {
@@ -14,9 +14,6 @@ export const Route = createFileRoute("/_auth")({
     if (auth.isAuthenticated) {
       throw redirect({
         to: "/residents" as string,
-        search: {
-          redirect: location.href, // Use 'redirect' as param name, easier for custom login page
-        },
       });
     }
   },
