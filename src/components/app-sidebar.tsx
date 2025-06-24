@@ -58,6 +58,9 @@ const data = {
   ],
 };
 
+const LOGO =
+  "https://i1douk2ebs.ufs.sh/f/bNWorhPHAMcEyWqQOurkDU5seKANz8f6qXi0E2IVQuZtaM9m";
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
@@ -81,11 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/residents" className="shrink-0">
-                <img
-                  src="src/assets/logo-512x512.png"
-                  alt="Logo"
-                  className="w-auto h-auto"
-                />
+                <img src={LOGO} alt="Logo" className="w-auto h-auto" />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -3,7 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { GalleryVerticalEndIcon } from "lucide-react";
 import React, { useState } from "react";
 import { z } from "zod";
@@ -14,6 +19,14 @@ const signUpSchema = z.object({
 });
 
 export const Route = createFileRoute("/_auth/sign-up")({
+  beforeLoad: () => {
+    const isSignUpEnabled = false;
+    if (!isSignUpEnabled) {
+      throw redirect({
+        to: "/sign-in" as string,
+      });
+    }
+  },
   component: SignUpPage,
 });
 
