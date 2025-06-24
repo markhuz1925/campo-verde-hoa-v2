@@ -7,7 +7,9 @@ export const Route = createFileRoute("/")({
 
     // Wait for auth to be loaded
     if (auth.isLoading) {
-      return; // Show "Redirecting..." while loading
+      throw redirect({
+        to: "/sign-in" as string,
+      });
     }
 
     // If user is authenticated, redirect to the main app page
