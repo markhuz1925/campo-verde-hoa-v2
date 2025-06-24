@@ -17,6 +17,11 @@ export const Route = createFileRoute("/_auth/sign-up")({
   component: SignUpPage,
 });
 
+const LOGO =
+  "https://i1douk2ebs.ufs.sh/f/bNWorhPHAMcEyWqQOurkDU5seKANz8f6qXi0E2IVQuZtaM9m";
+const BG =
+  "https://i1douk2ebs.ufs.sh/f/bNWorhPHAMcEbxDnRhHAMcEkzG0xLn4idwKS1Yy9FZuOHXIp";
+
 function SignUpPage() {
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -60,13 +65,13 @@ function SignUpPage() {
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="bg-muted relative hidden lg:block overflow-hidden">
         <img
-          src="src/assets/logo-512x512.png"
+          src={LOGO}
           alt="Image"
           className="absolute z-10 inset-0 h-[215px] w-[215px] object-cover dark:brightness-[0.2] dark:grayscale top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
         />
 
         <img
-          src="src/assets/cvhoa-landing.jpg"
+          src={BG}
           alt="Background Image"
           className="absolute inset-0 w-full h-full object-cover filter blur-xs saturate-200"
         />
