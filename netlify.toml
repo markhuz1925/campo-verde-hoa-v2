@@ -1,0 +1,15 @@
+# netlify.toml
+
+# Build settings for Vite React app
+[build]
+  command = "npm run build" # Command to run to build your project
+  publish = "dist"          # Directory that contains your compiled site (Vite's default)
+
+# Redirects for Single Page Applications (SPAs)
+# This rule ensures that all paths are rewritten to index.html
+# This is crucial for client-side routing (like TanStack Router) to work on Netlify.
+# Without this, refreshing a deep link (e.g., /app/residents) would result in a 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
