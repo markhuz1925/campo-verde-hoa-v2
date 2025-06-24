@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { GalleryVerticalEndIcon } from "lucide-react";
 import React, { useState } from "react";
 import { z } from "zod";
@@ -127,7 +127,7 @@ function SignInPage() {
                   Login with GitHub
                 </Button> */}
               </div>
-              <div className="text-center text-sm">
+              {/* <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
                 <Link
                   to="/sign-up"
@@ -136,7 +136,7 @@ function SignInPage() {
                 >
                   Sign up
                 </Link>
-              </div>
+              </div> */}
             </form>
           </div>
         </div>
