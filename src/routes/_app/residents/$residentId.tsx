@@ -26,7 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Plus } from "lucide-react";
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import type { PurchaseType } from "@/types";
@@ -65,7 +65,9 @@ function ResidentDetailPage() {
         .select("*")
         .eq("id", residentId)
         .single();
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       return data as Resident;
     },
   });
@@ -89,7 +91,9 @@ function ResidentDetailPage() {
         )
         .eq("resident_id", residentId)
         .order("purchase_date", { ascending: false });
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       return data as (Purchase & { product?: Sticker })[];
     },
   });
@@ -105,14 +109,17 @@ function ResidentDetailPage() {
         .from("products")
         .select("*")
         .eq("active", true);
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       return data as Sticker[];
     },
   });
 
-  React.useEffect(() => {
+  // --- React to productsData change to set availableProducts state ---
+  useEffect(() => {
     if (productsData) {
-      setAvailableProducts(productsData);
+      setAvailableProducts(productsData); // Set available products once fetched
     }
   }, [productsData]);
 
@@ -123,7 +130,7 @@ function ResidentDetailPage() {
     PurchaseFormValues
   >({
     mutationFn: async (values) => {
-      // FIX: Apply penalty doubling ONLY HERE, right before sending to DB
+      // Ensure penalty doubles amount if true
       const finalAmount = values.penalty
         ? values.amount_paid * 2
         : values.amount_paid;
@@ -143,26 +150,31 @@ function ResidentDetailPage() {
             plate_number: values.plate_number,
             af_number: values.af_number,
             penalty: values.penalty,
-            type: values.type,
+            type: values.type, // New: type of purchase
           },
         ])
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
       return data as Purchase;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["residentsWithPurchases"] });
+      queryClient.invalidateQueries({ queryKey: ["residentsWithPurchases"] }); // Invalidate main list
       queryClient.invalidateQueries({
         queryKey: ["residentPurchases", residentId],
-      });
-      setIsPurchaseFormOpen(false);
+      }); // Invalidate this resident's purchases
+      setIsPurchaseFormOpen(false); // Close form sheet
+      // Optionally show a success toast/message
     },
     onError: (err) => {
       console.error("Error purchasing sticker:", err);
+      // Optionally show an error toast/message
     },
   });
 
+  // Initialize react-hook-form for purchase form
   const form = useForm<PurchaseFormValues>({
     resolver: zodResolver(purchaseFormSchema),
     defaultValues: {
@@ -176,35 +188,62 @@ function ResidentDetailPage() {
       plate_number: "",
       af_number: "",
       penalty: false,
-      type: "New Application",
+      type: "New Application", // Default for new field
     },
   });
 
-  // --- Penalty Logic (watches 'penalty' and updates 'amount_paid' VISUALLY) ---
-  // This logic is for UI feedback only, the actual doubling for DB happens in mutationFn
-  React.useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === "penalty" || name === "product_id") {
+  // --- Penalty Logic (watches 'penalty' and updates 'amount_paid' visually) ---
+  const initialAmountForPenalty = useRef<number | undefined>(undefined); // Ref to store base amount
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name: fieldName }) => {
+      // Renamed 'name' to 'fieldName' to avoid TS6133
+      if (fieldName === "penalty") {
+        const currentAmount = form.getValues("amount_paid");
+        const isPenalty = value.penalty;
+
+        if (isPenalty) {
+          if (initialAmountForPenalty.current === undefined) {
+            initialAmountForPenalty.current = currentAmount;
+          }
+          form.setValue("amount_paid", currentAmount * 2, {
+            shouldValidate: true,
+          });
+        } else {
+          if (initialAmountForPenalty.current !== undefined) {
+            form.setValue("amount_paid", initialAmountForPenalty.current, {
+              shouldValidate: true,
+            });
+            initialAmountForPenalty.current = undefined;
+          } else {
+            const selectedProduct = availableProducts.find(
+              (p) => p.id === form.getValues("product_id")
+            );
+            if (selectedProduct) {
+              form.setValue("amount_paid", selectedProduct.amount, {
+                shouldValidate: true,
+              });
+            }
+          }
+        }
+      } else if (fieldName === "product_id" && !form.getValues("penalty")) {
+        // Renamed 'name' to 'fieldName'
         const selectedProduct = availableProducts.find(
           (p) => p.id === form.getValues("product_id")
         );
         if (selectedProduct) {
-          const baseAmount = selectedProduct.amount;
-          let newAmount = baseAmount;
-
-          if (form.getValues("penalty")) {
-            // Check the latest penalty value from form state
-            newAmount = baseAmount * 2;
-          }
-          form.setValue("amount_paid", newAmount, { shouldValidate: true });
+          form.setValue("amount_paid", selectedProduct.amount, {
+            shouldValidate: true,
+          });
+          initialAmountForPenalty.current = selectedProduct.amount;
         }
       }
     });
     return () => subscription.unsubscribe();
-  }, [form, availableProducts]); // Depend on form and availableProducts
+  }, [form, availableProducts]);
 
   // Reset form when purchase form opens
-  React.useEffect(() => {
+  useEffect(() => {
     if (isPurchaseFormOpen) {
       form.reset({
         product_id: "",
@@ -217,9 +256,10 @@ function ResidentDetailPage() {
         plate_number: "",
         af_number: "",
         penalty: false,
-        type: "New Application",
+        type: "New Application", // Default for new field
       });
       form.clearErrors();
+      initialAmountForPenalty.current = undefined; // Clear penalty base amount on form open
     }
   }, [isPurchaseFormOpen, form.reset, form.clearErrors]);
 
