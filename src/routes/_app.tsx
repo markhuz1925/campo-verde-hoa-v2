@@ -11,7 +11,7 @@ import { useAuth } from "../contexts/AuthContext"; // Import useAuth
 
 export const Route = createFileRoute("/_app")({
   // Path: /_app
-  beforeLoad: ({ context, location }) => {
+  beforeLoad: ({ context }) => {
     const { auth } = context; // Access auth context
 
     if (auth.isLoading) {
@@ -22,9 +22,6 @@ export const Route = createFileRoute("/_app")({
     if (!auth.isAuthenticated) {
       throw redirect({
         to: "/sign-in" as string,
-        search: {
-          redirect: location.href, // Use 'redirect' as param name
-        },
       });
     }
     // If signed in and loaded, allow navigation to app routes
