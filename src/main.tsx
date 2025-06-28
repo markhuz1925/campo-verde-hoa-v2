@@ -1,16 +1,14 @@
 // src/main.tsx
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client"; // Import Root type
 import "./index.css";
 
-// Import global providers and router setup here
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { routeTree } from "./routeTree.gen";
-import type { MyRouterContext } from "./types";
-// Adjust path if MyRouterContext is in router-context.ts
-// Assuming router-context.ts exists
+import type { MyRouterContext } from "./types"; // Assuming MyRouterContext is in types.ts
 
 const queryClient = new QueryClient();
 
@@ -32,35 +30,44 @@ export function AppWithRouterAndAuth() {
 
 // --- FIX STARTS HERE ---
 
-// Get the root element
-const rootElement = document.getElementById("root");
+const appContainer = document.getElementById("root");
 
-// Ensure the root element exists
-if (rootElement) {
-  // Check if the root has already been rendered (e.g., during HMR)
-  // This is a common pattern for Vite/React Fast Refresh to prevent re-calling createRoot
-  if (!rootElement.innerHTML) {
-    // Only create root if it's empty (first load)
-    const root = createRoot(rootElement);
-    root.render(
-      <StrictMode>
-        <AuthProvider>
-          <QueryClientProvider client={queryClient}>
-            <AppWithRouterAndAuth />
-          </QueryClientProvider>
-        </AuthProvider>
-      </StrictMode>
-    );
-  } else {
-    // If root already has content, it means HMR is active.
-    // In this case, we simply let HMR update the component tree.
-    // No explicit render call is needed here, as Vite's HMR handles the updates.
-    console.warn(
-      "React Root already initialized. Skipping createRoot call for HMR."
-    );
+if (!appContainer) {
+  throw new Error('Failed to find the root element with ID "root".');
+}
+
+// Declare `root` outside so it can be accessed and reused by HMR
+let root: Root | null = null;
+
+function renderApp() {
+  if (!root) {
+    // Only create root once
+    root = createRoot(appContainer!); // Assert not null since we checked above
   }
-} else {
-  console.error("Root element with ID 'root' not found in the document.");
+  root.render(
+    <StrictMode>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <AppWithRouterAndAuth />
+        </QueryClientProvider>
+      </AuthProvider>
+    </StrictMode>
+  );
+}
+
+// Initial render
+renderApp();
+
+// HMR setup:
+// If HMR is available (development mode)
+if (import.meta.hot) {
+  // Accept updates to this module.
+  // When main.tsx itself changes, this callback will be run.
+  // We explicitly re-render the app.
+  import.meta.hot.accept(() => {
+    console.log("main.tsx: HMR update accepted. Re-rendering application.");
+    renderApp();
+  });
 }
 
 // --- FIX ENDS HERE ---
