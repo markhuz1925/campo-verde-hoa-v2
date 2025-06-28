@@ -244,7 +244,7 @@ function ResidentsPage() {
     );
 
   return (
-    <section className="w-full px-4 sm:px-6 lg:px-8 py-12">
+    <section className="w-full p-4 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl font-bold">Residents</h2>
         <Button size="sm" onClick={() => setIsAddFormOpen(true)}>
@@ -305,13 +305,9 @@ function ResidentsPage() {
       {residents && residents.length > 0 ? (
         <Accordion type="single" collapsible className="w-full">
           {residents.map((resident) => (
-            <AccordionItem
-              value={resident.id}
-              key={resident.id}
-              className="border rounded-md mb-2 bg-card"
-            >
+            <AccordionItem value={resident.id} key={resident.id}>
               <AccordionTrigger className="flex justify-between items-center px-4 py-3 hover:no-underline">
-                <div className="flex flex-col items-start">
+                <div className="flex items-center gap-5 w-full">
                   <Link
                     to={`/residents/${resident.id}` as string}
                     className="font-semibold text-lg hover:underline"
