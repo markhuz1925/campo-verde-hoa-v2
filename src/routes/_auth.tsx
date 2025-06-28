@@ -1,5 +1,6 @@
 // src/routes/_auth.tsx
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext"; // Import useAuth for redirect logic
 
 export const Route = createFileRoute("/_auth")({
@@ -26,7 +27,7 @@ function AuthLayoutComponent() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        Loading authentication forms...
+        <Loader2 className="animate-spin" />
       </div>
     );
   }
