@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AppVehicleStickerSettingsRouteImport } from './routes/_app/vehicle-sticker-settings'
+import { Route as AppStickersIndexRouteImport } from './routes/_app/stickers/index'
 import { Route as AppResidentsIndexRouteImport } from './routes/_app/residents/index'
 import { Route as AppResidentsResidentIdRouteImport } from './routes/_app/residents/$residentId'
 
@@ -47,6 +48,11 @@ const AppVehicleStickerSettingsRoute =
     path: '/vehicle-sticker-settings',
     getParentRoute: () => AppRoute,
   } as any)
+const AppStickersIndexRoute = AppStickersIndexRouteImport.update({
+  id: '/stickers/',
+  path: '/stickers/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppResidentsIndexRoute = AppResidentsIndexRouteImport.update({
   id: '/residents/',
   path: '/residents/',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof AuthSignUpRoute
   '/residents/$residentId': typeof AppResidentsResidentIdRoute
   '/residents': typeof AppResidentsIndexRoute
+  '/stickers': typeof AppStickersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof AuthSignUpRoute
   '/residents/$residentId': typeof AppResidentsResidentIdRoute
   '/residents': typeof AppResidentsIndexRoute
+  '/stickers': typeof AppStickersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_app/residents/$residentId': typeof AppResidentsResidentIdRoute
   '/_app/residents/': typeof AppResidentsIndexRoute
+  '/_app/stickers/': typeof AppStickersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/residents/$residentId'
     | '/residents'
+    | '/stickers'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/residents/$residentId'
     | '/residents'
+    | '/stickers'
   id:
     | '__root__'
     | '/'
@@ -112,6 +123,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-up'
     | '/_app/residents/$residentId'
     | '/_app/residents/'
+    | '/_app/stickers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -164,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVehicleStickerSettingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/stickers/': {
+      id: '/_app/stickers/'
+      path: '/stickers'
+      fullPath: '/stickers'
+      preLoaderRoute: typeof AppStickersIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/residents/': {
       id: '/_app/residents/'
       path: '/residents'
@@ -185,12 +204,14 @@ interface AppRouteChildren {
   AppVehicleStickerSettingsRoute: typeof AppVehicleStickerSettingsRoute
   AppResidentsResidentIdRoute: typeof AppResidentsResidentIdRoute
   AppResidentsIndexRoute: typeof AppResidentsIndexRoute
+  AppStickersIndexRoute: typeof AppStickersIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppVehicleStickerSettingsRoute: AppVehicleStickerSettingsRoute,
   AppResidentsResidentIdRoute: AppResidentsResidentIdRoute,
   AppResidentsIndexRoute: AppResidentsIndexRoute,
+  AppStickersIndexRoute: AppStickersIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
