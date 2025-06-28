@@ -1,6 +1,5 @@
 // src/routes/__root.tsx
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useAuth } from "../contexts/AuthContext"; // Import useAuth from your context
 
 // Define the router context interface for this file
@@ -18,7 +17,7 @@ function RootComponent() {
     <>
       <Outlet />{" "}
       {/* Renders the matched top-level layout (_auth.tsx, _app.tsx, or index.tsx) */}
-      <TanStackRouterDevtools position="top-right" />
+      {/* <TanStackRouterDevtools position="top-right" /> */}
     </>
   );
 }
