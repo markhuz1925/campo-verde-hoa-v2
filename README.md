@@ -1,54 +1,210 @@
-# React + TypeScript + Vite
+# Campo Verde HOA v2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern web application for managing Campo Verde Homeowners Association operations, built with React, TypeScript, and Supabase.
 
-Currently, two official plugins are available:
+## 🏠 Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Campo Verde HOA v2 is a comprehensive management system designed to streamline HOA operations including:
 
-## Expanding the ESLint configuration
+- **Resident Management**: Track homeowners and tenants with phase/block/lot information
+- **Vehicle Sticker System**: Manage different sticker types (Homeowner, Tenant, Courier, etc.) with pricing
+- **Purchase Tracking**: Record sticker sales with detailed driver information and transaction history
+- **Secure Authentication**: Role-based access control with Supabase Auth
+- **Real-time Updates**: Live data synchronization across all users
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Technology Stack
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **Frontend**: React 19.1.0 + TypeScript
+- **Build Tool**: Vite 6.3.5 with Hot Module Replacement
+- **Routing**: TanStack Router v1.121.27 (file-based routing)
+- **State Management**: 
+  - TanStack Query v5.80.10 (server state)
+  - Zustand v5.0.5 (client state)
+  - React Context (authentication)
+- **Backend**: Supabase (PostgreSQL + real-time subscriptions)
+- **Styling**: TailwindCSS v4.1.10
+- **UI Components**: Radix UI + shadcn/ui
+- **Forms**: React Hook Form + Zod validation
+- **Deployment**: Netlify
+
+## 📋 Prerequisites
+
+- Node.js 18+ and npm
+- Supabase account and project (optional for development)
+
+## 🛠️ Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd campo-verde-hoa-v2
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Environment setup (optional):**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and add your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+   ```
+
+4. **Start development server:**
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at `http://localhost:5173/`
+
+## 🎯 Features
+
+### Authentication
+- Secure sign-in/sign-up with Supabase Auth
+- Protected routes with automatic redirects
+- Session persistence and management
+
+### Resident Management
+- Add, edit, and delete resident records
+- Search and filter by phase, block, or lot
+- Track resident purchase history
+- Detailed resident profiles
+
+### Vehicle Sticker System
+- Configurable sticker types and pricing
+- Color-coded sticker categories
+- Active/inactive status management
+- Bulk pricing updates
+
+### Purchase Tracking
+- Record sticker purchases with driver details
+- Track AF numbers and plate numbers
+- Support for renewals and new applications
+- Penalty tracking and management
+
+## 📁 Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── app-sidebar.tsx # Main navigation
+│   ├── resident-form.tsx
+│   └── sticker-form.tsx
+├── contexts/           # React contexts
+│   └── AuthContext.tsx
+├── hooks/              # Custom React hooks
+├── lib/                # Utilities and configurations
+│   ├── supabase.ts    # Supabase client
+│   └── utils.ts       # Helper functions
+├── routes/             # File-based routing
+│   ├── __root.tsx     # Root layout
+│   ├── index.tsx      # Landing page
+│   ├── _auth/         # Authentication routes
+│   └── _app/          # Protected app routes
+└── types.ts           # TypeScript interfaces
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🔧 Available Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## 🚀 Deployment
+
+### Netlify (Recommended)
+
+1. **Connect your repository** to Netlify
+2. **Set build settings:**
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+3. **Add environment variables** in Netlify dashboard:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. **Deploy!**
+
+### Manual Deployment
+
+```bash
+npm run build
+# Upload the `dist` folder to your hosting provider
 ```
+
+## 🗄️ Database Schema
+
+### Core Tables
+- `residents` - Homeowner/tenant information
+- `products` - Sticker types and pricing
+- `purchases` - Transaction records
+
+### Key Relationships
+- Residents have many purchases
+- Purchases belong to products (stickers)
+- Real-time subscriptions for live updates
+
+## 🔐 Authentication Flow
+
+The app uses a sophisticated authentication system:
+
+1. **Public routes**: `/sign-in`, `/sign-up`
+2. **Protected routes**: Everything under `/_app/*`
+3. **Automatic redirects**: Based on authentication status
+4. **Session management**: Persistent login with Supabase
+
+## 🛡️ Development Notes
+
+### Error Handling
+- Graceful fallbacks for missing Supabase configuration
+- Timeout mechanisms to prevent infinite loading
+- Comprehensive error boundaries
+
+### Performance
+- Code splitting with TanStack Router
+- Optimized bundle sizes
+- Efficient re-rendering with React Query
+
+### Type Safety
+- Strict TypeScript configuration
+- Zod schema validation for all forms
+- Type-safe API calls with Supabase
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is private and proprietary to Campo Verde Homeowners Association.
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**Infinite loading on homepage:**
+- Check browser console for errors
+- Verify Supabase configuration
+- Try hard refresh (Cmd+Shift+R)
+
+**Build errors:**
+- Clear node_modules: `rm -rf node_modules && npm install`
+- Check TypeScript errors: `npm run build`
+
+**Authentication issues:**
+- Verify Supabase URL and keys
+- Check network connectivity
+- Review browser console for auth errors
+
+## 📞 Support
+
+For technical support or feature requests, please contact the development team.

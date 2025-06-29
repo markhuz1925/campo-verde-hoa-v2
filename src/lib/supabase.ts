@@ -8,10 +8,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error(
     "Supabase URL or Anon Key is missing. Please check your .env file."
   );
-  // In a real app, you might want to throw an error or display a message to the user.
+  console.error("Using placeholder values for development.");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Use placeholder values if environment variables are missing
+const finalUrl = supabaseUrl || "https://placeholder.supabase.co";
+const finalKey = supabaseAnonKey || "placeholder-key";
+
+export const supabase = createClient(finalUrl, finalKey);
 
 // --- Auth State Management ---
 // This will be used by AuthContext to initialize and listen for changes
@@ -24,13 +28,41 @@ export interface AuthState {
 }
 
 export const getAuthSession = async (): Promise<AuthState> => {
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+  try {
+    // Check if we have valid Supabase configuration
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.warn("Supabase not configured - treating as unauthenticated");
+      return {
+        session: null,
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+      };
+    }
 
-  if (error) {
-    console.error("Error fetching session:", error);
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error("Error fetching session:", error);
+      return {
+        session: null,
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+      };
+    }
+
+    return {
+      session,
+      user: session?.user || null,
+      isAuthenticated: !!session,
+      isLoading: false,
+    };
+  } catch (error) {
+    console.error("Unexpected error in getAuthSession:", error);
     return {
       session: null,
       user: null,
@@ -38,13 +70,6 @@ export const getAuthSession = async (): Promise<AuthState> => {
       isLoading: false,
     };
   }
-
-  return {
-    session,
-    user: session?.user || null,
-    isAuthenticated: !!session,
-    isLoading: false,
-  };
 };
 
 export const onAuthStateChange = (

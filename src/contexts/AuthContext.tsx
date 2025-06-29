@@ -33,26 +33,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      const { session, user } = await getAuthSession();
-      setSession(session);
-      setUser(user);
+    // Check if Supabase is properly configured
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.warn("Supabase not configured - using mock auth (not authenticated)");
+      // Immediately set as not authenticated if Supabase isn't configured
+      setSession(null);
+      setUser(null);
       setIsLoading(false);
+      return;
+    }
+
+    const initializeAuth = async () => {
+      try {
+        const { session, user } = await getAuthSession();
+        setSession(session);
+        setUser(user);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Failed to initialize auth:", error);
+        // If auth fails, assume not authenticated and stop loading
+        setSession(null);
+        setUser(null);
+        setIsLoading(false);
+      }
     };
 
-    initializeAuth();
+    // Set a timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      console.warn("Auth initialization timeout - assuming not authenticated");
+      setSession(null);
+      setUser(null);
+      setIsLoading(false);
+    }, 2000); // Reduced to 2 seconds
 
-    // Listen for auth state changes from Supabase..
-    const {
-      data: { subscription },
-    } = onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user || null);
+    initializeAuth().then(() => {
+      clearTimeout(loadingTimeout);
+    }).catch(() => {
+      clearTimeout(loadingTimeout);
+      setSession(null);
+      setUser(null);
       setIsLoading(false);
     });
 
+    // Listen for auth state changes from Supabase..
+    let subscription: any;
+    try {
+      const {
+        data: { subscription: sub },
+      } = onAuthStateChange((_event, session) => {
+        setSession(session);
+        setUser(session?.user || null);
+        setIsLoading(false);
+        clearTimeout(loadingTimeout);
+      });
+      subscription = sub;
+    } catch (error) {
+      console.error("Failed to set up auth state listener:", error);
+      clearTimeout(loadingTimeout);
+      setSession(null);
+      setUser(null);
+      setIsLoading(false);
+    }
+
     return () => {
-      subscription.unsubscribe(); // Cleanup subscription on unmount
+      clearTimeout(loadingTimeout);
+      if (subscription) {
+        subscription.unsubscribe(); // Cleanup subscription on unmount
+      }
     };
   }, []); // Empty dependency array means this runs once on mount
 
