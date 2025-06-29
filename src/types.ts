@@ -135,3 +135,33 @@ export const purchaseFormSchema = z.object({
 });
 
 export type PurchaseFormValues = z.infer<typeof purchaseFormSchema>;
+
+// --- Transaction Interface ---
+export interface Transaction {
+  id: string;
+  purchase_id: string;
+  resident_id: string;
+  product_id: string;
+  transaction_type: 'purchase' | 'refund' | 'adjustment';
+  amount: number;
+  payment_method: 'cash' | 'check' | 'bank_transfer' | 'gcash';
+  reference_number?: string;
+  status: 'pending' | 'completed' | 'cancelled' | 'refunded';
+  transaction_date: string;
+  processed_by?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  // Joined data from transactions_detailed view
+  resident_name?: string;
+  phase?: string;
+  block?: string;
+  lot?: string;
+  product_name?: string;
+  product_color?: string;
+  driver_name?: string;
+  plate_number?: string;
+  sticker_number?: string;
+  af_number?: string;
+  purchase_type?: string;
+}

@@ -1,7 +1,7 @@
 // src/routes/_app/transactions/index.tsx
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
-import type { Purchase, Sticker } from "@/types";
+import type { Transaction } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Calendar, DollarSign, Package, TrendingUp } from "lucide-react";
@@ -25,39 +25,33 @@ export const Route = createFileRoute("/_app/transactions/")({
   component: TransactionsPage,
 });
 
-// Fetch all purchases with product details
-async function fetchPurchasesWithProducts(): Promise<
-  (Purchase & { product?: Sticker })[]
-> {
-  const { data: purchases, error } = await supabase
-    .from("purchases")
-    .select(
-      `
-      *,
-      product:products(*)
-    `
-    )
-    .order("purchase_date", { ascending: false });
+// Fetch all transactions with related details
+async function fetchTransactionsWithDetails(): Promise<Transaction[]> {
+  const { data: transactions, error } = await supabase
+    .from("transactions_detailed")
+    .select("*")
+    .eq("status", "completed")
+    .order("transaction_date", { ascending: false });
 
   if (error) throw error;
-  return purchases as (Purchase & { product?: Sticker })[];
+  return transactions as Transaction[];
 }
 
 function TransactionsPage() {
-  // Fetch purchases data
+  // Fetch transactions data
   const {
-    data: purchases,
+    data: transactions,
     isLoading,
     isError,
     error,
-  } = useQuery<(Purchase & { product?: Sticker })[], Error>({
-    queryKey: ["purchasesWithProducts"],
-    queryFn: fetchPurchasesWithProducts,
+  } = useQuery<Transaction[], Error>({
+    queryKey: ["transactionsWithDetails"],
+    queryFn: fetchTransactionsWithDetails,
   });
 
   // Process data for charts
   const chartData = useMemo(() => {
-    if (!purchases) return { monthlyIncome: [], stickerTypes: [], totalStats: {} };
+    if (!transactions) return { monthlyIncome: [], stickerTypes: [], totalStats: {} };
 
     // Monthly income data
     const monthlyMap = new Map<string, number>();
@@ -68,22 +62,22 @@ function TransactionsPage() {
     let totalRevenue = 0;
     let totalTransactions = 0;
 
-    purchases.forEach((purchase) => {
-      const date = new Date(purchase.purchase_date);
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.transaction_date);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
       // Monthly income
-      monthlyMap.set(monthKey, (monthlyMap.get(monthKey) || 0) + purchase.amount_paid);
+      monthlyMap.set(monthKey, (monthlyMap.get(monthKey) || 0) + transaction.amount);
       
       // Sticker types
-      const stickerName = purchase.product?.name || 'Unknown';
+      const stickerName = transaction.product_name || 'Unknown';
       const current = stickerMap.get(stickerName) || { income: 0, count: 0 };
       stickerMap.set(stickerName, {
-        income: current.income + purchase.amount_paid,
+        income: current.income + transaction.amount,
         count: current.count + 1,
       });
       
-      totalRevenue += purchase.amount_paid;
+      totalRevenue += transaction.amount;
       totalTransactions += 1;
     });
 
@@ -106,7 +100,7 @@ function TransactionsPage() {
         topSticker: stickerTypes[0]?.name || 'N/A',
       },
     };
-  }, [purchases]);
+  }, [transactions]);
 
   // Chart colors
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
